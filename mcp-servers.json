@@ -7,7 +7,7 @@
         "github.com/bitrise-io/bitrise-mcp-dev-environments@latest"
       ],
       "env": {
-        "BITRISE_TOKEN": "${BITRISE_TOKEN}"
+        "BITRISE_TOKEN": "${BITRISE_PAT}"
       }
     }
   }
