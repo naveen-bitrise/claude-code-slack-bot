@@ -6,7 +6,7 @@ node_modules/
 .env.local
 .env.*.local
 
-mcp-servers.json
+#mcp-servers.json
 
 # Build output
 dist/
