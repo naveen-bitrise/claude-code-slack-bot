@@ -1,6 +1,6 @@
 import { App } from '@slack/bolt';
 import { ClaudeHandler } from './claude-handler';
-import { SDKMessage } from '@anthropic-ai/claude-code';
+import { SDKMessage } from '@anthropic-ai/claude-agent-sdk';
 import { Logger } from './logger';
 import { WorkingDirectoryManager } from './working-directory-manager';
 import { FileHandler, ProcessedFile } from './file-handler';
@@ -153,10 +153,13 @@ export class SlackHandler {
       channel,
       thread_ts,
       isDM ? user : undefined
-    );
+    ) || process.cwd();
+
+    
 
     // Working directory is always required
     if (!workingDirectory) {
+
       let errorMessage = `⚠️ No working directory set. `;
       
       if (!isDM && !this.workingDirManager.hasChannelWorkingDirectory(channel)) {
@@ -216,9 +219,12 @@ export class SlackHandler {
 
     try {
       // Prepare the prompt with file attachments
-      const finalPrompt = processedFiles.length > 0 
+      let finalPrompt = processedFiles.length > 0 
         ? await this.fileHandler.formatFilePrompt(processedFiles, text || '')
         : text || '';
+
+      // Inject Slack context so skills know where to post
+      finalPrompt += `\n\n[Slack context: channel_id=${channel}, thread_ts=${thread_ts || ts}, is_dm=${channel.startsWith('D')}]`;
 
       this.logger.info('Sending query to Claude Code SDK', { 
         prompt: finalPrompt.substring(0, 200) + (finalPrompt.length > 200 ? '...' : ''), 
@@ -275,7 +281,7 @@ export class SlackHandler {
               part.type === 'tool_use' && part.name === 'TodoWrite'
             );
 
-            if (todoTool) {
+            if (todoTool && Array.isArray(todoTool.input?.todos)) {
               await this.handleTodoUpdate(todoTool.input, sessionKey, session?.sessionId, channel, thread_ts || ts, say);
             }
 
