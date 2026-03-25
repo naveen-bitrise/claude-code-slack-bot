@@ -479,7 +479,11 @@ export class SlackHandler {
   }
 
   private formatBashTool(input: any): string {
-    return `🖥️ *Running command:*\n\`\`\`bash\n${input.command}\n\`\`\``;
+    let command = input.command || '';
+    // Redact sensitive tokens from display
+    command = command.replace(/xoxb-[^\s"']+/g, 'xoxb-***REDACTED***');
+    command = command.replace(/xapp-[^\s"']+/g, 'xapp-***REDACTED***');
+    return `🖥️ *Running command:*\n\`\`\`bash\n${command}\n\`\`\``;
   }
 
   private formatGenericTool(toolName: string, input: any): string {

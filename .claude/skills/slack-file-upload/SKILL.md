@@ -8,6 +8,12 @@ tools: Bash
 
 Upload a local file into the currently active Slack thread, without using any public file hosting services.
 
+## CRITICAL SECURITY RULE
+
+NEVER echo, print, or include the SLACK_BOT_TOKEN value in any output, logs, or messages.
+Always reference it as `$SLACK_BOT_TOKEN` in commands — never expand or display its value.
+Do NOT post bash commands containing the raw token to Slack threads.
+
 ## Prerequisites
 
 - `SLACK_BOT_TOKEN` must be available in the environment
